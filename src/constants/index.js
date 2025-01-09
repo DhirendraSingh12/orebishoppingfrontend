@@ -1,16 +1,5 @@
 import {
-  spfOne,
-  spfTwo,
-  spfThree,
-  spfFour,
-  bestSellerOne,
-  bestSellerTwo,
-  bestSellerThree,
-  bestSellerFour,
-  newArrOne,
-  newArrTwo,
-  newArrThree,
-  newArrFour,
+
   imprimante1,
   imprimante2,
   imprimante4,
@@ -69,16 +58,42 @@ export const navBarList = [
   },
   {
     _id: 1003,
+    title: "Silpaulin",
+    link: "/Silpaulin",
+  },
+  {
+    _id: 1004,
+    title: "Applications",
+    link: "/Applications",
+  },
+  {
+    _id: 1005,
+    title: "Tarpaulin",
+    link: "/Tarpaulin",
+  },
+  {
+    _id: 1006,
+    title: "Agricultur",
+    link: "/AgricultureProducts",
+  },
+  {
+    _id: 1007,
+    title: "KisanFlex",
+    link: "/KisanFlex",
+  },
+
+  {
+    _id: 1008,
     title: "About",
     link: "/about",
   },
   {
-    _id: 1004,
+    _id: 1009,
     title: "Contact",
     link: "contact",
   },
   {
-    _id: 1005,
+    _id: 1010,
     title: "Journal",
     link: "/journal",
   },

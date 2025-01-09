@@ -1,0 +1,17 @@
+.chat-box {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 300px;
+    cursor: pointer;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    z-index: 2;
+  }
+  
+  .chat-box .fa-icon {
+    font-size: 30px; 
+    color: #0073b1; 
+  }
+  

@@ -1,0 +1,142 @@
+@keyframes popup-open {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: popup-open 0.3s ease-out;
+  }
+  
+  .popup-content {
+    background: white;
+    padding: 30px;
+    border-radius: 40px;
+    max-width: 580px;
+    width: 100%;
+    position: relative;
+    animation: popup-open 0.3s ease-out;
+  }
+  
+  .popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+   .popup-header h2{
+   font-weight: 600;
+   }
+  
+  .close-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  .form-group input,
+  .form-group select {
+    width: 250px;
+    padding: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .form-group textarea {
+    width: 520px;
+    padding: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .form-group .input-error {
+    border-color: #f44336;
+  }
+  
+  .form-group .error-message {
+    color: #f44336;
+    font-size: 12px;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  
+  .cancel-button {
+    background: whitesmoke;
+    color: red;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+  }
+  
+  .save-button {
+    background: #90caf9;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+  }
+ 
+    @media only screen and (max-width: 575px) {
+      .popupfrom {
+        flex-direction: column;
+        gap: 15px;
+      }
+    
+      .popup-content {
+        width: 300px;
+        height: 600px;
+        overflow-x: scroll;
+        margin-top: 80px;
+        border-radius: 10px;
+      }
+    
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+        padding: 10px;
+      }
+    
+      .form-actions {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+      }
+      
+      .save-button, .cancel-button {
+        width: 100%;
+        text-align: center;
+      }
+    }
+    

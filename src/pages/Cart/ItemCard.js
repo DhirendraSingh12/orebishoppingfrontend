@@ -2,45 +2,54 @@ import React from "react";
 import { ImCross } from "react-icons/im";
 import { useDispatch } from "react-redux";
 import {
-  deleteItem,
-  drecreaseQuantity,
-  increaseQuantity,
-} from "../../redux/orebiSlice";
+  removeFromCart,
+  updateQuantity,
+} from "../../Redux/authSlice/cartSlice";
 
 const ItemCard = ({ item }) => {
   const dispatch = useDispatch();
+
+  const handleRemove = () => {
+    dispatch(removeFromCart(item._id));
+  };
+  const handleDecrement = () => {
+    if (item.quantity > 1) {
+      dispatch(updateQuantity({ id: item._id, quantity: item.quantity - 1 }));
+    }
+  };
+  const handleIncrement = () => {
+    dispatch(updateQuantity({ id: item._id, quantity: item.quantity + 1 }));
+  };
+
   return (
     <div className="w-full grid grid-cols-5 mb-4 border py-2">
       <div className="flex col-span-5 mdl:col-span-2 items-center gap-4 ml-4">
         <ImCross
-          onClick={() => dispatch(deleteItem(item._id))}
-          className="text-primeColor hover:text-red-500 duration-300 cursor-pointer"
+          onClick={handleRemove}
+          className="text-primeColor hover:text-red-500 cursor-pointer"
         />
-        <img className="w-32 h-32" src={item.image} alt="productImage" />
-        <h1 className="font-titleFont font-semibold">{item.name}</h1>
+        <img className="w-32 h-32" src={item.img} alt={item.productName} />
+        <h1 className="font-semibold">{item.productName}</h1>
       </div>
-      <div className="col-span-5 mdl:col-span-3 flex items-center justify-between py-4 mdl:py-0 px-4 mdl:px-0 gap-6 mdl:gap-0">
-        <div className="flex w-1/3 items-center text-lg font-semibold">
-          ${item.price}
-        </div>
-        <div className="w-1/3 flex items-center gap-6 text-lg">
+      <div className="col-span-3 flex justify-between px-4 items-center">
+        <p>${item.price}</p>
+        <div className="flex items-center justify-center gap-4 p-1 bg-gray-100 rounded-lg shadow-md">
           <span
-            onClick={() => dispatch(drecreaseQuantity({ _id: item._id }))}
-            className="w-6 h-6 bg-gray-100 text-2xl flex items-center justify-center hover:bg-gray-300 cursor-pointer duration-300 border-[1px] border-gray-300 hover:border-gray-300"
+            onClick={handleDecrement}
+            className="cursor-pointer text-2xl text-gray-600 hover:text-gray-800 transition-colors duration-300"
           >
             -
           </span>
-          <p>{item.quantity}</p>
+          <p className="text-lg font-semibold text-gray-800">{item.quantity}</p>
           <span
-            onClick={() => dispatch(increaseQuantity({ _id: item._id }))}
-            className="w-6 h-6 bg-gray-100 text-2xl flex items-center justify-center hover:bg-gray-300 cursor-pointer duration-300 border-[1px] border-gray-300 hover:border-gray-300"
+            onClick={handleIncrement}
+            className="cursor-pointer text-2xl text-gray-600 hover:text-gray-800 transition-colors duration-300"
           >
             +
           </span>
         </div>
-        <div className="w-1/3 flex items-center font-titleFont font-bold text-lg">
-          <p>${item.quantity * item.price}</p>
-        </div>
+
+        <p>${(item.price * item.quantity).toFixed(2)}</p>
       </div>
     </div>
   );

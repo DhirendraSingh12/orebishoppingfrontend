@@ -2,50 +2,44 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
 import ProductInfo from "../../components/pageProps/productDetails/ProductInfo";
-import { FaDownload } from "react-icons/fa";
-
-const tabs = [
-  {
-    id: "Fiche Technique",
-    label: "Fiche Technique",
-  },
-  {
-    id: "Description",
-    label: "Description",
-    content:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic excepturi quibusdam odio deleniti reprehenderit facilis.",
-  },
-  {
-    id: "Video",
-    label: "Video",
-    content: (
-      <iframe
-        width="560"
-        height="315"
-        src="https://www.youtube.com/embed/watch?v=6e0yIRDVPlA&list=RD6e0yIRDVPlA&start_radio=1"
-        title="YouTube Video"
-        frameBorder="0"
-        allowFullScreen
-      ></iframe>
-    ),
-  },
-  // Add more tabs as needed
-];
+import { addToCart } from "../../Redux/authSlice/cartSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const ProductDetails = () => {
   const location = useLocation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const [prevLocation, setPrevLocation] = useState("");
-  const [productInfo, setProductInfo] = useState([]);
-  const [activeTab, setActiveTab] = useState(tabs[0].id);
+  const [productInfo, setProductInfo] = useState({});
+  const [selectedParts, setSelectedParts] = useState([]);
+  useEffect(() => {
+    if (location.state?.item) {
+      setProductInfo(location.state.item);
+      setPrevLocation(location.pathname);
+    }
+  }, [location]);
 
-  const handleTabClick = (tabId) => {
-    setActiveTab(tabId);
+  const handleSelectPart = (partId) => {
+    setSelectedParts((prevSelectedParts) => {
+      if (prevSelectedParts.includes(partId)) {
+        return prevSelectedParts.filter((id) => id !== partId);
+      } else {
+        return [...prevSelectedParts, partId];
+      }
+    });
   };
 
-  useEffect(() => {
-    setProductInfo(location.state.item);
-    setPrevLocation(location.pathname);
-  }, [location, productInfo.ficheTech]);
+  const handleAddToCart = () => {
+    const selectedItems = productInfo.parts.filter((part) =>
+      selectedParts.includes(part._id)
+    );
+    if (selectedItems.length > 0) {
+      dispatch(addToCart(selectedItems));
+      setSelectedParts([]);
+    }
+  };
 
   return (
     <div className="w-full mx-auto border-b-[1px] border-b-gray-300">
@@ -56,7 +50,7 @@ const ProductDetails = () => {
         <div className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-4 h-full -mt-5 xl:-mt-8 pb-10 bg-gray-100 p-4">
           <div className="h-full xl:col-span-2">
             <img
-              className="w-full h-full "
+              className="w-full h-full"
               src={productInfo.img}
               alt={productInfo.img}
             />
@@ -65,63 +59,83 @@ const ProductDetails = () => {
             <ProductInfo productInfo={productInfo} />
           </div>
         </div>
-        <div>
-          <div className=" space-x-4  pt-4">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                className={`${
-                  activeTab === tab.id
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200 text-gray-800"
-                } py-2 px-4  focus:outline-none`}
-                onClick={() => handleTabClick(tab.id)}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-          <div className="my-4">
-            {tabs.map((tab) => (
-              <div
-                key={tab.id}
-                className={activeTab === tab.id ? "" : "hidden"}
-              >
-                {tab.id === "Fiche Technique" && productInfo.ficheTech ? (
-                  <div>
-                    <table className="table-auto w-full">
-                      <tbody>
-                        {productInfo.ficheTech.map((row) => (
-                          <tr key={row.label} className="bg-gray-100">
-                            <td className="border px-4 py-2 font-semibold">
-                              {row.label}
-                            </td>
-                            <td className="border px-4 py-2">{row.value}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    <div className="my-4 flex justify-end">
-                      <button className="inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-500 hover:bg-blue-600 text-white font-bodyFont">
-                        <FaDownload className="h-5 w-5 mr-2 text-white" />
-                        <a
-                          href={productInfo.pdf}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-white"
-                        >
-                          Download PDF
-                        </a>{" "}
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <p>{tab.content}</p>
-                )}
-              </div>
-            ))}
+        <div className="container mx-auto px-4 py-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Features</h2>
+              <ul className="list-disc list-inside space-y-2">
+                {(productInfo.features || []).map((feature, index) => (
+                  <li key={index} className="text-gray-700">
+                    {feature || "feature"}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Specifications</h2>
+              <ul className="list-disc list-inside space-y-2">
+                {(productInfo.specifications || []).map((spec, index) => (
+                  <li key={index} className="text-gray-700">
+                    {spec || "feature"}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Other Features</h2>
+              <ul className="list-disc list-inside space-y-2">
+                {(productInfo.otherFeatures || []).map((feature, index) => (
+                  <li key={index} className="text-gray-700">
+                    {feature || "feature"}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
+
+        {productInfo && productInfo.parts?.length > 0 && (
+          <div className="my-4">
+            <h3 className="text-lg font-semibold mb-4">Sub Products</h3>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {productInfo.parts.map((part) => (
+                <div
+                  key={part._id}
+                  className={`p-4 border rounded-lg ${
+                    selectedParts.includes(part._id)
+                      ? "border-blue-500 bg-blue-50"
+                      : "hover:border-blue-500 hover:bg-blue-50"
+                  } cursor-pointer`}
+                  onClick={() => handleSelectPart(part._id)}
+                >
+                  <img
+                    src={`${process.env.REACT_APP_API_IMAGE}${part.image}`}
+                    alt={part.partName}
+                    className="w-full h-60 object-cover mb-2"
+                    style={{ objectFit: "cover" }}
+                  />
+                  <div className="d-flex justify-between items-center px-2">
+                    <p className="font-medium">{part.partName}</p>
+                    <p className="text-sm font-normal">{part.price} Dt</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6">
+              <button
+                className="bg-blue-500 text-white px-6 py-2 rounded-md"
+                onClick={handleAddToCart}
+                disabled={selectedParts.length === 0}
+              >
+                Add Selected to Cart
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

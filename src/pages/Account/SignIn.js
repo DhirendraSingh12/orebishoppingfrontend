@@ -1,48 +1,67 @@
 import React, { useState } from "react";
 import { BsCheckCircleFill } from "react-icons/bs";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { logoLight } from "../../assets/images";
+import { loginEmployee } from "../../services";
+import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "../../Redux/authSlice/authSlice";
+import { setUser } from "../../Redux/authSlice/userSlice";
 
 const SignIn = () => {
-  // ============= Initial State Start here =============
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // ============= Initial State End here ===============
-  // ============= Error Msg Start here =================
   const [errEmail, setErrEmail] = useState("");
   const [errPassword, setErrPassword] = useState("");
+  const navigate = useNavigate(); // To redirect after login
+  const dispatch = useDispatch();
 
-  // ============= Error Msg End here ===================
-  const [successMsg, setSuccessMsg] = useState("");
-  // ============= Event Handler Start here =============
   const handleEmail = (e) => {
     setEmail(e.target.value);
     setErrEmail("");
   };
+
   const handlePassword = (e) => {
     setPassword(e.target.value);
     setErrPassword("");
   };
-  // ============= Event Handler End here ===============
-  const handleSignUp = (e) => {
+  const handleSignIn = async (e) => {
     e.preventDefault();
-
+  
     if (!email) {
       setErrEmail("Enter your email");
+      return;
     }
-
+  
     if (!password) {
-      setErrPassword("Create a password");
+      setErrPassword("Enter your password");
+      return;
     }
-    // ============== Getting the value ==============
-    if (email && password) {
-      setSuccessMsg(
-        `Hello dear, Thank you for your attempt. We are processing to validate your access. Till then stay connected and additional assistance will be sent to you by your mail at ${email}`
-      );
-      setEmail("");
-      setPassword("");
+  
+    try {
+      // Ensure that loginEmployee function correctly returns token and user
+      const response = await loginEmployee(email, password);
+      
+      if (response && response.token && response.user) {
+        const { token, user } = response;
+        dispatch(loginSuccess({ token, user }));
+        dispatch(setUser(user));
+        localStorage.setItem("authToken", token);
+        
+        navigate("/");
+      } else {
+        toast.error("Invalid response structure");
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        setErrEmail("Invalid credentials");
+        setErrPassword("Invalid credentials");
+      } else {
+        toast.error("An error occurred. Please try again later.");
+      }
     }
   };
+  
   return (
     <div className="w-full h-screen flex items-center justify-center">
       <div className="w-1/2 hidden lgl:inline-flex h-full text-white">
@@ -65,7 +84,6 @@ const SignIn = () => {
                 Get started fast with OREBI
               </span>
               <br />
-              
             </p>
           </div>
           <div className="w-[300px] flex items-start gap-3">
@@ -77,7 +95,6 @@ const SignIn = () => {
                 Access all OREBI services
               </span>
               <br />
-             
             </p>
           </div>
           <div className="w-[300px] flex items-start gap-3">
@@ -89,7 +106,6 @@ const SignIn = () => {
                 Trusted by online Shoppers
               </span>
               <br />
-              
             </p>
           </div>
           <div className="flex items-center justify-between mt-10">
@@ -111,85 +127,41 @@ const SignIn = () => {
         </div>
       </div>
       <div className="w-full lgl:w-1/2 h-full">
-        {successMsg ? (
-          <div className="w-full lgl:w-[500px] h-full flex flex-col justify-center">
-            <p className="w-full px-4 py-10 text-green-500 font-medium font-titleFont">
-              {successMsg}
-            </p>
-            <Link to="/signup">
+        <form className="w-full lgl:w-[450px] h-screen flex items-center justify-center">
+          <div className="px-6 py-4 w-full h-[90%] flex flex-col justify-center">
+            <h1 className="text-3xl font-semibold mb-4">Sign in</h1>
+
+            <div className="flex flex-col gap-3">
+              <input
+                onChange={handleEmail}
+                value={email}
+                type="email"
+                placeholder="Work Email"
+                className="border p-2 rounded"
+              />
+              {errEmail && <p className="text-red-500">{errEmail}</p>}
+
+              <input
+                onChange={handlePassword}
+                value={password}
+                type="password"
+                placeholder="Password"
+                className="border p-2 rounded"
+              />
+              {errPassword && <p className="text-red-500">{errPassword}</p>}
+
               <button
-                className="w-full h-10 bg-primeColor text-gray-200 rounded-md text-base font-titleFont font-semibold 
-            tracking-wide hover:bg-black hover:text-white duration-300"
+                onClick={handleSignIn}
+                className="bg-primeColor text-white p-2 rounded"
               >
-                Sign Up
+                Sign In
               </button>
-            </Link>
-          </div>
-        ) : (
-          <form className="w-full lgl:w-[450px] h-screen flex items-center justify-center">
-            <div className="px-6 py-4 w-full h-[90%] flex flex-col justify-center overflow-y-scroll scrollbar-thin scrollbar-thumb-primeColor">
-              <h1 className="font-titleFont underline underline-offset-4 decoration-[1px] font-semibold text-3xl mdl:text-4xl mb-4">
-                Sign in
-              </h1>
-              <div className="flex flex-col gap-3">
-                {/* Email */}
-                <div className="flex flex-col gap-.5">
-                  <p className="font-titleFont text-base font-semibold text-gray-600">
-                    Work Email
-                  </p>
-                  <input
-                    onChange={handleEmail}
-                    value={email}
-                    className="w-full h-8 placeholder:text-sm placeholder:tracking-wide px-4 text-base font-medium placeholder:font-normal rounded-md border-[1px] border-gray-400 outline-none"
-                    type="email"
-                    placeholder="john@workemail.com"
-                  />
-                  {errEmail && (
-                    <p className="text-sm text-red-500 font-titleFont font-semibold px-4">
-                      <span className="font-bold italic mr-1">!</span>
-                      {errEmail}
-                    </p>
-                  )}
-                </div>
-
-                {/* Password */}
-                <div className="flex flex-col gap-.5">
-                  <p className="font-titleFont text-base font-semibold text-gray-600">
-                    Password
-                  </p>
-                  <input
-                    onChange={handlePassword}
-                    value={password}
-                    className="w-full h-8 placeholder:text-sm placeholder:tracking-wide px-4 text-base font-medium placeholder:font-normal rounded-md border-[1px] border-gray-400 outline-none"
-                    type="password"
-                    placeholder="Create password"
-                  />
-                  {errPassword && (
-                    <p className="text-sm text-red-500 font-titleFont font-semibold px-4">
-                      <span className="font-bold italic mr-1">!</span>
-                      {errPassword}
-                    </p>
-                  )}
-                </div>
-
-                <button
-                  onClick={handleSignUp}
-                  className="bg-primeColor hover:bg-black text-gray-200 hover:text-white cursor-pointer w-full text-base font-medium h-10 rounded-md  duration-300"
-                >
-                  Sign In
-                </button>
-                <p className="text-sm text-center font-titleFont font-medium">
-                  Don't have an Account?{" "}
-                  <Link to="/signup">
-                    <span className="hover:text-blue-600 duration-300">
-                      Sign up
-                    </span>
-                  </Link>
-                </p>
-              </div>
+              <p>
+                Don't have an account? <Link to="/signup">Sign up</Link>
+              </p>
             </div>
-          </form>
-        )}
+          </div>
+        </form>
       </div>
     </div>
   );
